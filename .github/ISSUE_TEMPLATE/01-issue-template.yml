@@ -1,0 +1,25 @@
+name: "Issue"
+description: "Create a new issue for the Seoul-1 repository"
+projects: [ "jathavaan/6" ]
+
+body:
+  - type: textarea
+    id: description
+    attributes:
+      label: "Issue Description"
+      description: "Please provide a detailed description of the issue"
+    validations:
+      required: true
+
+  - type: dropdown
+    id: severity
+    attributes:
+      label: "Severity"
+      description: "Select the severity of the issue"
+      options:
+        - "Critical"
+        - "High"
+        - "Medium"
+        - "Low"
+    validations:
+      required: true
