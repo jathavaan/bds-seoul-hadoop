@@ -1,6 +1,4 @@
-﻿version: '3'
-
-services:
+﻿services:
   namenode:
     build: .
     container_name: namenode
@@ -8,15 +6,15 @@ services:
     env_file: .env
     environment:
       ROLE: ${NAMENODE_ROLE}
-      NAMENODE_IP: ${NAMENODE_IP}
-      DATANODE1_IP: ${DATANODE1_IP}
-      DATANODE2_IP: ${DATANODE2_IP}
-      JAVA_HOME: ${JAVA_HOME}
+    #      NAMENODE_IP: ${NAMENODE_IP}
+    #      DATANODE1_IP: ${DATANODE1_IP}
+    #      JAVA_HOME: ${JAVA_HOME}
     ports:
       - "9870:9870"
       - "9000:9000"
     volumes:
       - namenode-data:/hadoop/dfs/name
+      - ./hadoop/.hadoop.env:/opt/.hadoop.env:ro
 
   datanode1:
     build: .
@@ -25,12 +23,12 @@ services:
     env_file: .env
     environment:
       ROLE: ${DATANODE_ROLE}
-      NAMENODE_IP: ${NAMENODE_IP}
-      DATANODE1_IP: ${DATANODE1_IP}
-      DATANODE2_IP: ${DATANODE2_IP}
-      JAVA_HOME: ${JAVA_HOME}
+    #      NAMENODE_IP: ${NAMENODE_IP}
+    #      DATANODE1_IP: ${DATANODE1_IP}
+    #      JAVA_HOME: ${JAVA_HOME}
     volumes:
       - datanode1-data:/hadoop/dfs/data
+      - ./hadoop/.hadoop.env:/opt/.hadoop.env:ro
 
 volumes:
   namenode-data:

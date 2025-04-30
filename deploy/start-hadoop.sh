@@ -1,4 +1,4 @@
-﻿#!/bin/bash
+#!/bin/bash
 
 if [ -f "./.env" ]; then
     echo "Loading environment from ./env"
@@ -22,7 +22,8 @@ if [[ "$ROLE" == "namenode" ]]; then
     fi
 
     echo "Starting HDFS: Namenode + Datanodes"
-    start-dfs.sh
+    hdfs namenode &
+    hdfs datanode &
 else
     echo "Starting Datanode..."
     hdfs datanode

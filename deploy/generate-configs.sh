@@ -1,9 +1,10 @@
-﻿#!/bin/bash
-
+#!/bin/bash
 
 set -a
 source /opt/.hadoop.env
 set +a
+
+HADOOP_CONF_DIR=${HADOOP_CONF_DIR:-/hadoop/etc/hadoop}
 
 echo "Generating config files for ROLE=$ROLE"
 
