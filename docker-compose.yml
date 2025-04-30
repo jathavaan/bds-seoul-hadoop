@@ -13,8 +13,8 @@ services:
       DATANODE2_IP: ${DATANODE2_IP}
       JAVA_HOME: ${JAVA_HOME}
     ports:
-      - "9870:9870"   # Namenode UI
-      - "9000:9000"   # HDFS RPC
+      - "9870:9870"
+      - "9000:9000"
     volumes:
       - namenode-data:/hadoop/dfs/name
 
