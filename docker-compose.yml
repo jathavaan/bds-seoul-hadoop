@@ -6,9 +6,6 @@
     env_file: .env
     environment:
       ROLE: ${NAMENODE_ROLE}
-    #      NAMENODE_IP: ${NAMENODE_IP}
-    #      DATANODE1_IP: ${DATANODE1_IP}
-    #      JAVA_HOME: ${JAVA_HOME}
     ports:
       - "9870:9870"
       - "9000:9000"
@@ -16,20 +13,17 @@
       - namenode-data:/hadoop/dfs/name
       - ./hadoop/.hadoop.env:/opt/.hadoop.env:ro
 
-  datanode1:
+  datanode:
     build: .
-    container_name: datanode1
-    hostname: datanode1
+    container_name: datanode
+    hostname: datanode
     env_file: .env
     environment:
       ROLE: ${DATANODE_ROLE}
-    #      NAMENODE_IP: ${NAMENODE_IP}
-    #      DATANODE1_IP: ${DATANODE1_IP}
-    #      JAVA_HOME: ${JAVA_HOME}
     volumes:
-      - datanode1-data:/hadoop/dfs/data
+      - datanode-data:/hadoop/dfs/data
       - ./hadoop/.hadoop.env:/opt/.hadoop.env:ro
 
 volumes:
   namenode-data:
-  datanode1-data:
+  datanode-data:
