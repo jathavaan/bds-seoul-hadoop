@@ -1,0 +1,52 @@
+﻿version: '3'
+
+services:
+  namenode:
+    build: .
+    container_name: namenode
+    hostname: namenode
+    env_file: .env
+    environment:
+      ROLE: ${NAMENODE_ROLE}
+      NAMENODE_IP: ${NAMENODE_IP}
+      DATANODE1_IP: ${DATANODE1_IP}
+      DATANODE2_IP: ${DATANODE2_IP}
+      JAVA_HOME: ${JAVA_HOME}
+    ports:
+      - "9870:9870"   # Namenode UI
+      - "9000:9000"   # HDFS RPC
+    volumes:
+      - namenode-data:/hadoop/dfs/name
+
+  datanode1:
+    build: .
+    container_name: datanode1
+    hostname: datanode1
+    env_file: .env
+    environment:
+      ROLE: ${DATANODE_ROLE}
+      NAMENODE_IP: ${NAMENODE_IP}
+      DATANODE1_IP: ${DATANODE1_IP}
+      DATANODE2_IP: ${DATANODE2_IP}
+      JAVA_HOME: ${JAVA_HOME}
+    volumes:
+      - datanode1-data:/hadoop/dfs/data
+
+  datanode2:
+    build: .
+    container_name: datanode2
+    hostname: datanode2
+    env_file: .env
+    environment:
+      ROLE: ${DATANODE_ROLE}
+      NAMENODE_IP: ${NAMENODE_IP}
+      DATANODE1_IP: ${DATANODE1_IP}
+      DATANODE2_IP: ${DATANODE2_IP}
+      JAVA_HOME: ${JAVA_HOME}
+    volumes:
+      - datanode2-data:/hadoop/dfs/data
+
+volumes:
+  namenode-data:
+  datanode1-data:
+  datanode2-data:
