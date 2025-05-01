@@ -1,4 +1,19 @@
 ﻿services:
+  pipline:
+    build:
+      context: .
+      dockerfile: Pipeline.Dockerfile
+    container_name: pipeline
+    depends_on:
+      - namenode
+      - datanode
+    volumes:
+      - .:/app
+    working_dir: /app
+    environment:
+      HOST_IP: ${HOST_IP}
+    entrypoint: [ "python3", "main.py" ]
+
   namenode:
     build: .
     container_name: namenode
