@@ -22,12 +22,18 @@ if [[ "$ROLE" == "namenode" ]]; then
 
   echo "Starting Hadoop NameNode (foreground)..."
   hdfs namenode &
+  echo "NameNode is running..."
   hdfs datanode &
-  wait
+  echo "DataNode is running..."
 
+  echo "Running Python pipeline"
+  pip3.11 install --no-cache-dir -r /app/requirements.txt
+  python3.11 /app/main.py &
+  wait
 elif [[ "$ROLE" == "datanode" ]]; then
   echo "Starting Hadoop DataNode (foreground)..."
   exec hdfs datanode
+  echo "DataNode is running..."
 else
   echo "Unknown Role=$ROLE"
   exit 1

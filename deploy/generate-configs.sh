@@ -4,7 +4,8 @@ set -a
 source /opt/.hadoop.env
 set +a
 
-HADOOP_CONF_DIR=${HADOOP_CONF_DIR:-/hadoop/etc/hadoop}
+HADOOP_HOME=${HADOOP_HOME:-/opt/hadoop-3.2.1}
+HADOOP_CONF_DIR=${HADOOP_CONF_DIR:-$HADOOP_HOME/etc/hadoop}
 
 echo "Generating config files for ROLE=$ROLE"
 
