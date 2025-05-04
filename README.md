@@ -3,8 +3,12 @@
 Make sure to add `.env` in the root directory. It should look like this for local development
 
 ```dotenv
+ROLE=local
+
 NAMENODE_ROLE=namenode
 DATANODE_ROLE=datanode
+
+HOST_IP=namenode
 ```
 
 and in the folder `hadoop` add `.hadoop.env` which for the local development should look like this
