@@ -51,8 +51,8 @@ if __name__ == "__main__":
     MAPPER_PATH = "./src/mapreduce/mapper.py"
     REDUCER_PATH = "./src/mapreduce/reducer.py"
 
-    # Hadoop streaming jar location (adjust this if needed)
-    HADOOP_STREAMING_JAR = "/usr/local/hadoop/share/hadoop/tools/lib/hadoop-streaming-*.jar"
+    # Hadoop streaming jar location
+    HADOOP_STREAMING_JAR = "/opt/hadoop-3.2.1/share/hadoop/tools/lib/hadoop-streaming-3.2.1.jar"
 
     # HDFS input and output paths
     INPUT_PATH = Config.HDFS_INPUT_PATH.value
@@ -64,17 +64,35 @@ if __name__ == "__main__":
         "hadoop", "fs", "-rm", "-r", OUTPUT_PATH
     ], stderr=subprocess.DEVNULL)
 
+    # Extract filenames only for use in -mapper and -reducer arguments
+    MAPPER_FILENAME = MAPPER_PATH.split("/")[-1]
+    REDUCER_FILENAME = REDUCER_PATH.split("/")[-1]
+
     # Run Hadoop streaming job
     print("Running MapReduce job via Hadoop streaming...")
     streaming_command = [
         "hadoop", "jar", HADOOP_STREAMING_JAR,
         "-input", INPUT_PATH,
         "-output", OUTPUT_PATH,
-        "-mapper", f"python3 {MAPPER_PATH}",
-        "-reducer", f"python3 {REDUCER_PATH}",
+        "-mapper", f"python3.11 {MAPPER_FILENAME}",
+        "-reducer", f"python3.11 {REDUCER_FILENAME}",
         "-file", MAPPER_PATH,
         "-file", REDUCER_PATH
     ]
 
-    subprocess.run(" ".join(streaming_command), shell=True, check=True)
+    # Optionally print for debugging
+    print("Streaming command:\n", " ".join(streaming_command))
+
+    # Execute
+    subprocess.run(streaming_command, check=True)
+
     print("MapReduce job completed.")
+
+    print("Fetching and displaying output from HDFS...")
+    result = subprocess.run(
+        ["hadoop", "fs", "-cat", os.path.join(OUTPUT_PATH, "part-*")],
+        text=True,
+        capture_output=True
+    )
+
+    print(result.stdout)
