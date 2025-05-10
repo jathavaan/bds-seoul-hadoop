@@ -7,6 +7,10 @@ load_dotenv()
 
 
 class Config(Enum):
+    # Logger
+    LOGGER_WIDTH_OFFSET = 75
+
+    # Hadoop
     HDFS_CONNECTION_STRING = f"http://{os.getenv('HOST_IP')}:9870"
     HDFS_USER = "root"
 
