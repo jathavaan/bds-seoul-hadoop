@@ -7,6 +7,7 @@ from hdfs import InsecureClient, HdfsError
 from src import Config
 
 if __name__ == "__main__":
+    start_time = time.time()
     print("Sleeping for 30 seconds... Waiting for Hadoop to finish setup")
     time.sleep(Config.HDFS_SETUP_TIMEOUT.value)
 
@@ -47,52 +48,25 @@ if __name__ == "__main__":
     client.upload(Config.HDFS_INPUT_PATH.value, file_to_upload, overwrite=True)
     print(f"File uploaded: {client.content(Config.HDFS_INPUT_PATH.value)}")
 
-    # Paths to the Python scripts
-    MAPPER_PATH = "./src/mapreduce/mapper.py"
-    REDUCER_PATH = "./src/mapreduce/reducer.py"
-
-    # Hadoop streaming jar location
-    HADOOP_STREAMING_JAR = "/opt/hadoop-3.2.1/share/hadoop/tools/lib/hadoop-streaming-3.2.1.jar"
-
-    # HDFS input and output paths
-    INPUT_PATH = Config.HDFS_INPUT_PATH.value
-    OUTPUT_PATH = Config.HDFS_OUTPUT_PATH.value
-
-    # Remove existing output dir if it exists
     print("Cleaning up old HDFS output directory (if any)...")
     subprocess.run([
-        "hadoop", "fs", "-rm", "-r", OUTPUT_PATH
+        "hadoop", "fs", "-rm", "-r", Config.HDFS_OUTPUT_PATH.value
     ], stderr=subprocess.DEVNULL)
 
-    # Extract filenames only for use in -mapper and -reducer arguments
-    MAPPER_FILENAME = MAPPER_PATH.split("/")[-1]
-    REDUCER_FILENAME = REDUCER_PATH.split("/")[-1]
-
-    # Run Hadoop streaming job
     print("Running MapReduce job via Hadoop streaming...")
-    streaming_command = [
-        "hadoop", "jar", HADOOP_STREAMING_JAR,
-        "-input", INPUT_PATH,
-        "-output", OUTPUT_PATH,
-        "-mapper", f"python3.11 {MAPPER_FILENAME}",
-        "-reducer", f"python3.11 {REDUCER_FILENAME}",
-        "-file", MAPPER_PATH,
-        "-file", REDUCER_PATH
-    ]
-
-    # Optionally print for debugging
-    print("Streaming command:\n", " ".join(streaming_command))
-
-    # Execute
-    subprocess.run(streaming_command, check=True)
-
+    subprocess.run(Config.HDFS_STREAMING_COMMAND.value, check=True)
     print("MapReduce job completed.")
 
     print("Fetching and displaying output from HDFS...")
     result = subprocess.run(
-        ["hadoop", "fs", "-cat", os.path.join(OUTPUT_PATH, "part-*")],
+        ["hadoop", "fs", "-cat", os.path.join(Config.HDFS_OUTPUT_PATH.value, "part-*")],
         text=True,
         capture_output=True
     )
 
     print(result.stdout)
+
+    end_time = time.time()
+    elapsed_time = end_time - start_time
+
+    print(f"Runtime: {elapsed_time / 60:.2f} minutes")

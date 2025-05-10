@@ -62,12 +62,6 @@ RUN update-alternatives --install /usr/bin/python python /usr/local/bin/python3.
 RUN python -c "import ssl; print(ssl.OPENSSL_VERSION)" && \
     pip install --upgrade pip
 
-## Download hadoop-streaming JAR manually (since it’s missing in bde2020 base image)
-#RUN wget https://archive.apache.org/dist/hadoop/core/hadoop-3.2.1/hadoop-3.2.1.tar.gz && \
-#    tar -xzf hadoop-3.2.1.tar.gz && \
-#    cp hadoop-3.2.1/share/hadoop/tools/lib/hadoop-streaming-3.2.1.jar $HADOOP_HOME/share/hadoop/tools/lib/ && \
-#    rm -rf hadoop-3.2.1*
-
 # Copy templates and scripts
 COPY hadoop/templates/ /opt/templates/
 COPY deploy/entrypoint.sh /opt/
@@ -79,5 +73,3 @@ RUN chmod +x ./src/mapreduce/mapper.py ./src/mapreduce/reducer.py
 
 # Run the entrypoint when the container starts
 ENTRYPOINT ["/opt/entrypoint.sh"]
-
-
