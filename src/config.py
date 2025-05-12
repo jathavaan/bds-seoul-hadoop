@@ -42,3 +42,6 @@ class Config(Enum):
 
     HDFS_SETUP_TIMEOUT = 30
     HDFS_CONNECT_MAX_RETRIES = 5
+
+    # Temp file storage
+    TEMP_FILE_STORAGE_DIR = os.path.join(os.getcwd(), "reviews")
