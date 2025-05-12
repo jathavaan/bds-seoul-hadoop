@@ -12,10 +12,21 @@ class MapreduceService:
     def __init__(self, logger: logging.Logger):
         self.__logger = logger
 
-    def run_mapreduce_subprocess(self, filename: str) -> None:
+    def run_mapreduce_subprocess(self, game_id: int) -> None:
         self.__logger.info("Running MapReduce job via Hadoop streaming...")
         start_time = time.time()
-        subprocess.run(Config.HDFS_STREAMING_COMMAND.value, check=True)
+
+        mapreduce_command = [
+            "hadoop", "jar", Config.HADOOP_STREAMING_JAR_PATH.value,
+            "-input", os.path.join(Config.HDFS_INPUT_PATH.value, str(game_id)),
+            "-output", os.path.join(Config.HDFS_OUTPUT_PATH.value, str(game_id)),
+            "-mapper", f"python3.11 {Config.MAPPER_FILENAME.value}",
+            "-reducer", f"python3.11 {Config.REDUCER_FILENAME.value}",
+            "-file", Config.MAPPER_PATH.value,
+            "-file", Config.REDUCER_PATH.value,
+        ]
+
+        subprocess.run(mapreduce_command, check=True)
         elapsed_time = round((time.time() - start_time) / 60, 2)
         self.__logger.info(f"MapReduce job completed in {elapsed_time} minutes")
 
