@@ -10,7 +10,7 @@ from hdfs import InsecureClient, HdfsError
 from src import Config
 
 
-class DirectoryType(Enum):
+class HdfsDirectoryType(Enum):
     INPUT = 0,
     OUTPUT = 1
 
@@ -78,11 +78,11 @@ class HadoopService:
         self.__logger.info(f"Uploaded {filename} to HDFS")
         return True
 
-    def delete_file_from_hdfs(self, filename: str, directory_type: DirectoryType) -> bool:
+    def delete_file_from_hdfs(self, filename: str, directory_type: HdfsDirectoryType) -> bool:
         match directory_type:
-            case DirectoryType.INPUT:
+            case HdfsDirectoryType.INPUT:
                 filepath = os.path.join(Config.HDFS_INPUT_PATH.value, filename)
-            case DirectoryType.OUTPUT:
+            case HdfsDirectoryType.OUTPUT:
                 filepath = os.path.join(Config.HDFS_OUTPUT_PATH.value, filename)
             case _:
                 raise ValueError("Invalid directory type")
@@ -91,13 +91,13 @@ class HadoopService:
         self.__logger.info(f"Deleted {filename} from HDFS")
         return True
 
-    def clear_directory(self, directory_type: DirectoryType) -> bool:
+    def clear_directory(self, directory_type: HdfsDirectoryType) -> bool:
         match directory_type:
-            case DirectoryType.INPUT:
+            case HdfsDirectoryType.INPUT:
                 command = [
                     "hadoop", "fs", "-rm", "-r", Config.HDFS_INPUT_PATH.value
                 ]
-            case DirectoryType.OUTPUT:
+            case HdfsDirectoryType.OUTPUT:
                 command = [
                     "hadoop", "fs", "-rm", "-r", Config.HDFS_OUTPUT_PATH.value
                 ]
@@ -105,7 +105,7 @@ class HadoopService:
                 raise ValueError("Invalid directory type")
 
         self.__logger.info(
-            f"Cleaning up old HDFS {'input' if directory_type == DirectoryType.INPUT else 'output'} directory (if any)"
+            f"Cleaning up old HDFS {'input' if directory_type == HdfsDirectoryType.INPUT else 'output'} directory (if any)"
         )
         subprocess.run(command, stderr=subprocess.DEVNULL)
         self.__logger.info("Directory cleared")
