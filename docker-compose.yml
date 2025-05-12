@@ -7,7 +7,7 @@
     working_dir: /app
     environment:
       ROLE: ${NAMENODE_ROLE}
-      HOST_ID: ${HOST_IP}
+      HOST_ID: ${HDFS_HOST_IP}
     ports:
       - "9870:9870"
       - "9000:9000"

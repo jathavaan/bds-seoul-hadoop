@@ -62,8 +62,36 @@ RUN update-alternatives --install /usr/bin/python python /usr/local/bin/python3.
 RUN python -c "import ssl; print(ssl.OPENSSL_VERSION)" && \
     pip install --upgrade pip
 
+# Build and install latest librdkafka from source (for ARM)
+RUN apt-get update && apt-get install -y \
+    build-essential \
+    libssl-dev \
+    libsasl2-dev \
+    libzstd-dev \
+    liblz4-dev \
+    git \
+    cmake \
+    wget \
+    curl \
+    python3-dev
+
+RUN git clone https://github.com/confluentinc/librdkafka.git && \
+    cd librdkafka && \
+    git checkout v2.10.0 && \
+    ./configure && \
+    make -j$(nproc) -C src && \
+    make -j$(nproc) -C src-cpp && \
+    make -j$(nproc) install -C src && \
+    make -j$(nproc) install -C src-cpp && \
+    ldconfig
+
+
+# Install Python bindings for confluent-kafka using the compiled librdkafka
+RUN pip install --no-binary :all: confluent-kafka
+
 # Copy templates and scripts
 COPY hadoop/templates/ /opt/templates/
+COPY src/mapreduce/ /src/mapreduce/
 COPY deploy/entrypoint.sh /opt/
 COPY deploy/generate-configs.sh /opt/
 
