@@ -175,7 +175,7 @@ logs/
 *.logs
 
 # Temp files
-reviews/*
+reviews/*.txt
 
 # Test data
 *.csv
