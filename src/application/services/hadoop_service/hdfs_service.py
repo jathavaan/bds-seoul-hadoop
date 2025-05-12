@@ -2,7 +2,6 @@
 import os
 import subprocess
 import time
-from argparse import ArgumentError
 from enum import Enum
 
 from hdfs import InsecureClient, HdfsError
@@ -15,7 +14,7 @@ class HdfsDirectoryType(Enum):
     OUTPUT = 1
 
 
-class HadoopService:
+class HdfsService:
     __logger: logging.Logger
     __client: InsecureClient
 
