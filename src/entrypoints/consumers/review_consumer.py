@@ -32,6 +32,7 @@ class ReviewConsumer(ConsumerBase):
         self.__mapreduce_service = container.mapreduce_service()
 
         self.__messages = []
+        topics = [Config.KAFKA_REVIEW_TOPIC.value]
         self.__consumer = Consumer({
             "bootstrap.servers": Config.KAFKA_BOOTSTRAP_SERVERS.value,
             "group.id": Config.KAFKA_GROUP_ID.value,
@@ -39,10 +40,10 @@ class ReviewConsumer(ConsumerBase):
             "enable.auto.commit": True
         })
 
-        self.__consumer.subscribe(Config.KAFKA_TOPICS.value)
+        self.__consumer.subscribe(topics)
         self.__logger.info(
             f"Kafka Consumer connected to bootstrap server [{Config.KAFKA_BOOTSTRAP_SERVERS.value}] "
-            f"with group ID {Config.KAFKA_GROUP_ID.value}, subscribed to topic(s): {', '.join(Config.KAFKA_TOPICS.value)}"
+            f"with group ID {Config.KAFKA_GROUP_ID.value}, subscribed to topic(s): {', '.join(topics)}"
         )
 
     def consume(self) -> bool:
@@ -63,8 +64,9 @@ class ReviewConsumer(ConsumerBase):
                 self.__game_id = review.game_id
             elif self.__game_id != review.game_id:
                 self.__logger.warning(
-                    f"Game ID mismatch expected {self.__game_id} but got {review.game_id}. Skipping message from producer"
+                    f"Game ID mismatch expected {self.__game_id} but got {review.game_id}. Skipping message from producer..."
                 )
+
                 continue
 
             self.__messages.append(review)

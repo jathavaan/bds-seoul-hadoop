@@ -13,7 +13,8 @@ class Config(Enum):
     # Kafka
     KAFKA_BOOTSTRAP_SERVERS = os.getenv('KAFKA_BOOTSTRAP_SERVERS')
     KAFKA_GROUP_ID = "mariadb_consumer_group"
-    KAFKA_TOPICS = ["game_topic"]
+    KAFKA_REVIEW_TOPIC = "reviews"
+    KAFKA_RESULT_TOPIC = "results"
     KAFKA_POLL_TIMEOUT = 1.0
 
     # Hadoop

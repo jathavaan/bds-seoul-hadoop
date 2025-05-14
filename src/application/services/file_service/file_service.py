@@ -17,7 +17,7 @@ class FileService:
 
         filename = f"{datetime.datetime.now().strftime('%Y%m%d')}_{game_id}.txt"
         filepath = os.path.join(Config.TEMP_FILE_STORAGE_DIR.value, filename)
-        file_content = ";".join([str(review) for review in reviews])
+        file_content = "\n".join([str(review) for review in reviews])
 
         self.__logger.info(f"Writing {filepath} to {Config.TEMP_FILE_STORAGE_DIR.value}")
         with open(filepath, encoding="utf-8") as file:
