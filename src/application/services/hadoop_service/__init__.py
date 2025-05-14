@@ -1,1 +1,1 @@
-﻿from .hadooop_service import HadoopService, HdfsDirectoryType
+﻿from .hdfs_service import  HdfsService, HdfsDirectoryType

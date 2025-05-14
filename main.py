@@ -1,4 +1,3 @@
-import os
 import subprocess
 import time
 
@@ -6,6 +5,7 @@ from hdfs import InsecureClient, HdfsError
 
 from src import Config
 from src.entrypoints.consumers.review_consumer import ReviewConsumer
+from src.entrypoints.producers import MapreduceReduceResultProducer
 
 if __name__ == "__main__":
     start_time = time.time()
@@ -71,13 +71,15 @@ if __name__ == "__main__":
     elapsed_time = end_time - start_time
 
     consumer = ReviewConsumer()
+    producer = MapreduceReduceResultProducer()
 
     try:
         while True:
             if consumer.consume():
-                break
+                producer.produce()
     except KeyboardInterrupt:
         pass
     finally:
         consumer.close()
+        producer.close()
         print(f"Runtime: {elapsed_time / 60:.2f} minutes")

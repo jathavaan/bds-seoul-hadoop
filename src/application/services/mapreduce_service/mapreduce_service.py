@@ -30,10 +30,10 @@ class MapreduceService:
         elapsed_time = round((time.time() - start_time) / 60, 2)
         self.__logger.info(f"MapReduce job completed in {elapsed_time} minutes")
 
-    def get_mapreduce_result(self) -> dict[str, tuple[float, float]]:
+    def get_mapreduce_result(self, game_id: int) -> dict[str, tuple[float, float]]:
         self.__logger.info("Displaying results from MapReduce job")
         subprocess_result = subprocess.run(
-            ["hadoop", "fs", "-cat", os.path.join(Config.HDFS_OUTPUT_PATH.value, "part-*")],
+            ["hadoop", "fs", "-cat", os.path.join(Config.HDFS_OUTPUT_PATH.value, str(game_id), "part-*")],
             text=True,
             capture_output=True
         )

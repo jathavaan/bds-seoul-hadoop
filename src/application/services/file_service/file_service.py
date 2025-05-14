@@ -12,7 +12,7 @@ class FileService:
     def __init__(self, logger: logging.Logger):
         self.__logger = logger
 
-    def write_to_file(self, reviews: list[Review]) -> None:
+    def write_to_file(self, reviews: list[Review]) -> str:
         game_id = next(map(lambda review: review.game_id, reviews), None)
 
         filename = f"{datetime.datetime.now().strftime('%Y%m%d')}_{game_id}.txt"
@@ -22,6 +22,8 @@ class FileService:
         self.__logger.info(f"Writing {filepath} to {Config.TEMP_FILE_STORAGE_DIR.value}")
         with open(filepath, encoding="utf-8") as file:
             file.write(file_content)
+
+        return filename
 
     def get_filepaths(self, game_id: int) -> list[str]:
         return [

@@ -32,5 +32,7 @@ class Config(Enum):
     HDFS_SETUP_TIMEOUT = 30
     HDFS_CONNECT_MAX_RETRIES = 5
 
+    HADOOP_BATCH_SIZE = 2500
+
     # Temp file storage
     TEMP_FILE_STORAGE_DIR = os.path.join(os.getcwd(), "reviews")
