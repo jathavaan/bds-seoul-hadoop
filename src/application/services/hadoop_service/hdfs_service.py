@@ -79,7 +79,7 @@ class HdfsService:
         filepath = os.path.join(Config.TEMP_FILE_STORAGE_DIR.value, filename)
         input_path = os.path.join(Config.HDFS_INPUT_PATH.value, str(game_id))
 
-        self.__client.upload(input_path, filepath)
+        self.__client.upload(input_path, filepath, overwrite=True)
         self.__logger.info(f"Uploaded {filename} to HDFS")
 
         return True

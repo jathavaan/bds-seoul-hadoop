@@ -31,6 +31,7 @@ class ReviewConsumer(ConsumerBase):
         self.__hdfs_service = container.hdfs_service()
         self.__mapreduce_service = container.mapreduce_service()
 
+        self.__game_id = 0
         self.__messages = []
         topics = [Config.KAFKA_REVIEW_TOPIC.value]
         self.__consumer = Consumer({
@@ -49,8 +50,8 @@ class ReviewConsumer(ConsumerBase):
     def consume(self) -> bool:
         while len(self.__messages) < Config.HADOOP_BATCH_SIZE.value:
             message = self.__consumer.poll(Config.KAFKA_POLL_TIMEOUT.value)
+
             if not message:
-                self.__logger.warning("No message received")
                 return False
 
             if message.error():
@@ -70,7 +71,6 @@ class ReviewConsumer(ConsumerBase):
                 continue
 
             self.__messages.append(review)
-            self.__logger.info(message.as_string())
         else:
             self.__process_batch()
             self.__clean_up_process()
@@ -80,8 +80,9 @@ class ReviewConsumer(ConsumerBase):
         self.__consumer.close()
         self.__logger.info("Shut down review consumer")
 
-    def get_output(self) -> dict[int, dict[str, tuple[float, float]]]:
-        pass
+    def get_output(self) -> dict[str, tuple[float, float]]:
+        self.__logger.info(self.__result)
+        return self.__result
 
     def __process_batch(self) -> None:
         if not self.__messages:

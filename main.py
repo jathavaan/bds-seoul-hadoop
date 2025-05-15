@@ -1,3 +1,5 @@
+import time
+
 from src.entrypoints.consumers.review_consumer import ReviewConsumer
 from src.entrypoints.producers import MapreduceReduceResultProducer
 
@@ -31,6 +33,8 @@ if __name__ == "__main__":
     try:
         while True:
             if consumer.consume():
+                consumer.get_output()
+                time.sleep(3)
                 producer.produce()
     except KeyboardInterrupt:
         pass

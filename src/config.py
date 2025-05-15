@@ -1,4 +1,5 @@
-﻿import os
+﻿import logging
+import os
 from enum import Enum
 
 from dotenv import load_dotenv
@@ -8,14 +9,15 @@ load_dotenv()
 
 class Config(Enum):
     # Logger
+    LOGGING_LEVEL = logging.DEBUG
     LOGGER_WIDTH_OFFSET = 75
 
     # Kafka
     KAFKA_BOOTSTRAP_SERVERS = os.getenv('KAFKA_BOOTSTRAP_SERVERS')
-    KAFKA_GROUP_ID = "mariadb_consumer_group"
+    KAFKA_GROUP_ID = "hadoop_consumer_group"
     KAFKA_REVIEW_TOPIC = "reviews"
     KAFKA_RESULT_TOPIC = "results"
-    KAFKA_POLL_TIMEOUT = 1.0
+    KAFKA_POLL_TIMEOUT = 0.5
 
     # Hadoop
     HDFS_CONNECTION_STRING = f"http://{os.getenv('HDFS_HOST_IP')}:9870"
@@ -33,7 +35,7 @@ class Config(Enum):
     HDFS_SETUP_TIMEOUT = 30
     HDFS_CONNECT_MAX_RETRIES = 5
 
-    HADOOP_BATCH_SIZE = 2500
+    HADOOP_BATCH_SIZE = 1000
 
     # Temp file storage
     TEMP_FILE_STORAGE_DIR = os.path.join(os.getcwd(), "reviews")

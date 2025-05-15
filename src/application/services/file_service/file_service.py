@@ -20,7 +20,7 @@ class FileService:
         file_content = "\n".join([str(review) for review in reviews])
 
         self.__logger.info(f"Writing {filepath} to {Config.TEMP_FILE_STORAGE_DIR.value}")
-        with open(filepath, encoding="utf-8") as file:
+        with open(filepath, mode="w+", encoding="utf-8") as file:
             file.write(file_content)
 
         return filename
