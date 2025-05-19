@@ -33,8 +33,11 @@ class MapreduceService:
             self.__hdfs_service.clear_directory(game_id=game_id, directory_type=HdfsDirectoryType.OUTPUT)
 
             subprocess.run(mapreduce_command, check=True)
-            elapsed_time = round((time.time() - start_time) / 60, 2)
-            self.__logger.info(f"MapReduce job completed in {elapsed_time} minutes")
+            elapsed_time = time.time() - start_time
+            self.__logger.info(
+                f"MapReduce job completed in {round(elapsed_time / 60, 2)} minutes" if elapsed_time > 60 else
+                f"MapReduce job completed in {round(elapsed_time, 2)} seconds"
+            )
         except subprocess.CalledProcessError as e:
             self.__logger.error(f"MapReduce job failed with exit code {e.returncode}")
             self.__logger.error(f"Expected command: {' '.join(mapreduce_command)}")
@@ -44,19 +47,21 @@ class MapreduceService:
             raise e
 
     def get_mapreduce_result(self, game_id: int) -> dict[str, tuple[float, float]]:
-        self.__logger.info("Displaying results from MapReduce job")
         subprocess_result = subprocess.run(
             ["hadoop", "fs", "-cat", os.path.join(Config.HDFS_OUTPUT_PATH.value, str(game_id), "part-*")],
             text=True,
             capture_output=True
         )
 
-        result = {}
+        result: dict[str, tuple[float, float]] = {}
         lines = subprocess_result.stdout.strip().split("\n")
 
         for line in lines:
-            self.__logger.debug(line)  # TODO: Delete
             time_group, recommended, not_recommended = line.split(",")
+
+            recommended = float(recommended.strip("\t"))
+            not_recommended = float(not_recommended.strip("\t"))
+
             result[time_group] = (recommended, not_recommended)
 
         return result

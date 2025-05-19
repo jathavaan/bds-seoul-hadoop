@@ -32,10 +32,11 @@ if __name__ == "__main__":
 
     try:
         while True:
-            if consumer.consume():
-                consumer.get_output()
-                time.sleep(3)
-                producer.produce()
+            is_batch_ready, game_id, result = consumer.consume()
+            if is_batch_ready:
+                producer.produce(game_id=game_id, producer_input=result)
+                is_batch_ready = False
+
     except KeyboardInterrupt:
         pass
     finally:

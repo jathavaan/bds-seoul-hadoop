@@ -47,16 +47,16 @@ class ReviewConsumer(ConsumerBase):
             f"with group ID {Config.KAFKA_GROUP_ID.value}, subscribed to topic(s): {', '.join(topics)}"
         )
 
-    def consume(self) -> bool:
+    def consume(self) -> tuple[bool, int, dict[str, tuple[float, float]]]:
         while len(self.__messages) < Config.HADOOP_BATCH_SIZE.value:
             message = self.__consumer.poll(Config.KAFKA_POLL_TIMEOUT.value)
 
             if not message:
-                return False
+                continue
 
             if message.error():
                 self.__logger.error(message.error())
-                return False
+                continue
 
             review_data = json.loads(message.value().decode("utf-8"))
             review = Review(**review_data)
@@ -73,8 +73,11 @@ class ReviewConsumer(ConsumerBase):
             self.__messages.append(review)
         else:
             self.__process_batch()
+            game_id = self.__game_id
+            result = self.__result
             self.__clean_up_process()
-            return True
+
+            return True, game_id, result
 
     def close(self) -> None:
         self.__consumer.close()

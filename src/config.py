@@ -9,8 +9,8 @@ load_dotenv()
 
 class Config(Enum):
     # Logger
-    LOGGING_LEVEL = logging.DEBUG
-    LOGGER_WIDTH_OFFSET = 75
+    LOGGING_LEVEL = logging.INFO
+    LOGGER_WIDTH_OFFSET = 90
 
     # Kafka
     KAFKA_BOOTSTRAP_SERVERS = os.getenv('KAFKA_BOOTSTRAP_SERVERS')

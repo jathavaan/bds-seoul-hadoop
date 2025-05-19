@@ -40,7 +40,9 @@ def main() -> None:
         except ValueError:
             continue
 
-        print(f"{key}\t{1 if is_recommended == 1 else 0},{0 if is_recommended == 1 else 1}")
+        # TODO: The line below causes the final output to contain one review to little
+        if key:
+            print(f"{key}\t{1 if is_recommended == 1 else 0},{0 if is_recommended == 1 else 1}")
 
 
 if __name__ == "__main__":
