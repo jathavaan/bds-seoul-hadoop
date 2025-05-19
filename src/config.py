@@ -9,7 +9,7 @@ load_dotenv()
 
 class Config(Enum):
     # Logger
-    LOGGING_LEVEL = logging.INFO
+    LOGGING_LEVEL = logging.DEBUG
     LOGGER_WIDTH_OFFSET = 90
 
     # Kafka
@@ -35,7 +35,7 @@ class Config(Enum):
     HDFS_SETUP_TIMEOUT = 30
     HDFS_CONNECT_MAX_RETRIES = 5
 
-    HADOOP_BATCH_SIZE = 1000
+    HADOOP_BATCH_SIZE = 200
 
     # Temp file storage
     TEMP_FILE_STORAGE_DIR = os.path.join(os.getcwd(), "reviews")
