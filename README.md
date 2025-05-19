@@ -4,11 +4,11 @@ Make sure to add `.env` in the root directory. It should look like this for loca
 
 ```dotenv
 ROLE=local
-
 NAMENODE_ROLE=namenode
 DATANODE_ROLE=datanode
-
-HOST_IP=namenode
+HDFS_HOST_IP=namenode
+KAFKA_BOOTSTRAP_SERVERS=host.docker.internal
+SEQ_LOG_SERVER=host.docker.internal
 ```
 
 and in the folder `hadoop` add `.hadoop.env` which for the local development should look like this
@@ -17,12 +17,10 @@ and in the folder `hadoop` add `.hadoop.env` which for the local development sho
 NAMENODE_IP=namenode
 DATANODE_IP=datanode
 
-DFS_REPLICATION=1
+DFS_REPLICATION=2
 HDFS_NAMENODE_USER=root
 HDFS_DATANODE_USER=root
 HDFS_SECONDARYNAMENODE_USER=root
-
-JAVA_HOME=/usr/lib/jvm/java-8-openjdk-amd64
 ```
 
 For the `.env` file `NAMENODE_ROLE` and `DATANODE_ROLE` should be substituted with `ROLE` which should either have the
