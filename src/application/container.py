@@ -1,12 +1,10 @@
-﻿import logging
-
-from dependency_injector import containers, providers
+﻿from dependency_injector import containers, providers
 
 from src import Config
 from src.application.common import Logger
+from src.application.services.file_service import FileService
 from src.application.services.hadoop_service.hdfs_service import HdfsService
 from src.application.services.mapreduce_service import MapreduceService
-from src.application.services.file_service import FileService
 
 
 class Container(containers.DeclarativeContainer):

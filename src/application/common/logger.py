@@ -3,7 +3,19 @@ import os
 from logging.handlers import RotatingFileHandler
 from pathlib import Path
 
+import seqlog
+
 from src import Config
+
+seqlog.log_to_seq(
+    server_url=Config.SEQ_URL.value,
+    api_key=None,
+    level=Config.LOGGING_LEVEL.value,
+    batch_size=5,
+    override_root_logger=True
+)
+
+logging.getLogger("hdfs.client").level = logging.ERROR
 
 
 class Logger:
@@ -24,7 +36,7 @@ class Logger:
         if name in Logger._instances:
             return Logger._instances[name]
 
-        log_file = os.path.join("logs", "mariadb_consumer.log")
+        log_file = os.path.join("logs", "hadoop.log")
         log_path = Path(log_file).parent
         log_path.mkdir(parents=True, exist_ok=True)
 
@@ -44,7 +56,7 @@ class Logger:
         logger.addHandler(file_handler)
         logger.addHandler(console_handler)
 
-        logger.propagate = False
+        logger.propagate = True
 
         Logger._instances[name] = logger
         return logger

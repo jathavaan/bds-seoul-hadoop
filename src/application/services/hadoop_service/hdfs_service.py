@@ -100,18 +100,20 @@ class HdfsService:
     def clear_directory(self, game_id: int, directory_type: HdfsDirectoryType) -> bool:
         match directory_type:
             case HdfsDirectoryType.INPUT:
+                path = os.path.join(Config.HDFS_INPUT_PATH.value, str(game_id))
                 command = [
-                    "hadoop", "fs", "-rm", "-r", os.path.join(Config.HDFS_INPUT_PATH.value, str(game_id))
+                    "hadoop", "fs", "-rm", "-r", path
                 ]
             case HdfsDirectoryType.OUTPUT:
+                path = os.path.join(Config.HDFS_OUTPUT_PATH.value, str(game_id))
                 command = [
-                    "hadoop", "fs", "-rm", "-r", os.path.join(Config.HDFS_OUTPUT_PATH.value, str(game_id))
+                    "hadoop", "fs", "-rm", "-r", path
                 ]
             case _:
                 raise ValueError("Invalid directory type")
 
         self.__logger.info(
-            f"Cleaning up old HDFS {'input' if directory_type == HdfsDirectoryType.INPUT else 'output'} directory (if any)"
+            f"Cleaning up old HDFS {'input' if directory_type == HdfsDirectoryType.INPUT else 'output'} directory (if any) at path: {path}"
         )
         subprocess.run(command, stderr=subprocess.DEVNULL)
         self.__logger.info("Directory cleared")

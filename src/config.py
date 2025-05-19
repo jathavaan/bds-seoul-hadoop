@@ -11,6 +11,7 @@ class Config(Enum):
     # Logger
     LOGGING_LEVEL = logging.DEBUG
     LOGGER_WIDTH_OFFSET = 90
+    SEQ_URL = "http://host.docker.internal:5341"
 
     # Kafka
     KAFKA_BOOTSTRAP_SERVERS = os.getenv('KAFKA_BOOTSTRAP_SERVERS')
