@@ -9,7 +9,7 @@ load_dotenv()
 
 class Config(Enum):
     # Logger
-    LOGGING_LEVEL = logging.DEBUG
+    LOGGING_LEVEL = logging.INFO
     LOGGER_WIDTH_OFFSET = 90
     SEQ_URL = "http://host.docker.internal:5341"
 
