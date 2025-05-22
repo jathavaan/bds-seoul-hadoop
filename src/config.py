@@ -11,11 +11,12 @@ class Config(Enum):
     # Logger
     LOGGING_LEVEL = logging.INFO
     LOGGER_WIDTH_OFFSET = 90
-    SEQ_URL = f"{os.getenv('SEQ_LOG_SERVER')}:5341"
+    SEQ_URL = f"http://{os.getenv('SEQ_SERVER')}:{os.getenv('SEQ_PORT')}"
+    SEQ_LOG_BATCH_SIZE = 1
 
     # Kafka
     KAFKA_BOOTSTRAP_SERVERS = f"{os.getenv('KAFKA_BOOTSTRAP_SERVERS')}:9092"
-    KAFKA_GROUP_ID = "hadoop_consumer_group"
+    KAFKA_GROUP_ID = "seoul"
     KAFKA_REVIEW_TOPIC = "reviews"
     KAFKA_RESULT_TOPIC = "results"
     KAFKA_POLL_TIMEOUT = 0.5

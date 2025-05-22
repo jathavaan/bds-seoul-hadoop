@@ -1,5 +1,3 @@
-import time
-
 from src.entrypoints.consumers.review_consumer import ReviewConsumer
 from src.entrypoints.producers import MapreduceReduceResultProducer
 

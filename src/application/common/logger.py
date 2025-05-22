@@ -11,7 +11,7 @@ seqlog.log_to_seq(
     server_url=Config.SEQ_URL.value,
     api_key=None,
     level=Config.LOGGING_LEVEL.value,
-    batch_size=5,
+    batch_size=Config.SEQ_LOG_BATCH_SIZE.value,
     override_root_logger=True
 )
 
