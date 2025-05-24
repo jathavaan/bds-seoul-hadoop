@@ -19,7 +19,7 @@ class MapreduceReduceResultProducer(ProducerBase[dict[str, tuple[float, float]]]
 
     def produce(self, game_id: int, producer_input: dict[str, tuple[float, float]]) -> bool:
         self.__producer.produce(
-            topic=Config.KAFKA_RESULT_TOPIC.value,
+            topic=Config.KAFKA_MR_RESULT_TOPIC.value,
             key=str(game_id).encode("utf-8"),
             value=json.dumps(producer_input).encode("utf-8"),
             callback=self.__delivery_report
