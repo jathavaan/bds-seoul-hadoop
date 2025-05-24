@@ -18,7 +18,7 @@ class Config(Enum):
     KAFKA_BOOTSTRAP_SERVERS = f"{os.getenv('KAFKA_BOOTSTRAP_SERVERS')}:9092"
     KAFKA_GROUP_ID = "seoul"
     KAFKA_REVIEW_TOPIC = "reviews"
-    KAFKA_RESULT_TOPIC = "results"
+    KAFKA_MR_RESULT_TOPIC = "mapreduce_results"
     KAFKA_POLL_TIMEOUT = 0.5
 
     # Hadoop
