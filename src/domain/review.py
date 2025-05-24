@@ -17,4 +17,8 @@ class Review:
             self.date_posted = datetime.strptime(self.date_posted, "%Y-%m-%d")
 
     def __repr__(self):
-        return f"{self.game_id},{self.date_posted},{1 if self.is_recommended else 0},{self.hours_played},{self.user_id},{self.correlation_id}"
+        """
+        Do NOT change this unless more fields are being added to the Map Reduce job
+        :return: Returns string on the format for Map Reduce job
+        """
+        return f"{self.game_id},{self.date_posted},{1 if self.is_recommended else 0},{self.hours_played},{self.user_id}"
