@@ -14,5 +14,5 @@ class ConsumerBase(Generic[T], KafkaBase):
 
 
 class ProducerBase(Generic[T], KafkaBase):
-    def produce(self, game_id: int, producer_input: T) -> bool:
+    def produce(self, producer_input: T) -> bool:
         raise NotImplementedError("Produce method not implemented")

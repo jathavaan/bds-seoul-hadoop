@@ -5,10 +5,11 @@ from confluent_kafka import Producer
 
 from src import Config
 from src.application import Container
+from src.application.services.mapreduce_service import MapreduceDto
 from src.entrypoints.base import ProducerBase
 
 
-class MapreduceReduceResultProducer(ProducerBase[dict[str, tuple[float, float]]]):
+class MapreduceReduceResultProducer(ProducerBase[MapreduceDto]):
     __logger: logging.Logger
     __producer: Producer
 
@@ -17,15 +18,14 @@ class MapreduceReduceResultProducer(ProducerBase[dict[str, tuple[float, float]]]
         self.__logger = container.logger()
         self.__producer = Producer({"bootstrap.servers": Config.KAFKA_BOOTSTRAP_SERVERS.value})
 
-    def produce(self, game_id: int, producer_input: dict[str, tuple[float, float]]) -> bool:
+    def produce(self, producer_input: MapreduceDto) -> bool:
         self.__producer.produce(
             topic=Config.KAFKA_MR_RESULT_TOPIC.value,
-            key=str(game_id).encode("utf-8"),
-            value=json.dumps(producer_input).encode("utf-8"),
+            key=str(producer_input.game_id).encode("utf-8"),
+            value=json.dumps(producer_input.to_dict()).encode("utf-8"),
             callback=self.__delivery_report
         )
 
-        self.__producer.flush()
         return True
 
     def close(self) -> None:

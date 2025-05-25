@@ -7,7 +7,7 @@ from src import Config
 from src.application import Container
 from src.application.services.file_service import FileService
 from src.application.services.hadoop_service import HdfsService, HdfsDirectoryType
-from src.application.services.mapreduce_service import MapreduceService
+from src.application.services.mapreduce_service import MapreduceService, MapreduceDto
 from src.domain import Review
 from src.entrypoints.base import ConsumerBase
 
@@ -19,9 +19,10 @@ class ReviewConsumer(ConsumerBase):
     __mapreduce_service: MapreduceService
 
     __consumer: Consumer
-    __game_id: int
-    __messages: list[Review]
-    __result: dict[str, tuple[float, float]]
+    __game_id: int = 0
+    __correlation_id: str | None = None
+    __messages: list[Review] = []
+    __result: MapreduceDto | None = None
 
     def __init__(self):
         container = Container()
@@ -31,8 +32,6 @@ class ReviewConsumer(ConsumerBase):
         self.__hdfs_service = container.hdfs_service()
         self.__mapreduce_service = container.mapreduce_service()
 
-        self.__game_id = 0
-        self.__messages = []
         topics = [Config.KAFKA_REVIEW_TOPIC.value]
         self.__consumer = Consumer({
             "bootstrap.servers": Config.KAFKA_BOOTSTRAP_SERVERS.value,
@@ -47,8 +46,9 @@ class ReviewConsumer(ConsumerBase):
             f"with group ID {Config.KAFKA_GROUP_ID.value}, subscribed to topic(s): {', '.join(topics)}"
         )
 
-    def consume(self) -> tuple[bool, int, dict[str, tuple[float, float]]]:
-        while len(self.__messages) < Config.HADOOP_BATCH_SIZE.value:
+    def consume(self) -> tuple[bool, MapreduceDto]:
+        is_last_review = False
+        while len(self.__messages) < Config.HADOOP_BATCH_SIZE.value and not is_last_review:
             message = self.__consumer.poll(Config.KAFKA_POLL_TIMEOUT.value)
 
             if not message:
@@ -60,6 +60,16 @@ class ReviewConsumer(ConsumerBase):
 
             review_data = json.loads(message.value().decode("utf-8"))
             review = Review(**review_data)
+            is_last_review = review.is_last_review
+
+            if self.__correlation_id is None:
+                self.__correlation_id = review.correlation_id
+            elif self.__correlation_id != review.correlation_id:
+                self.__logger.warning(
+                    f"Correlation ID mismatch expected {self.__correlation_id} but got {review.correlation_id}. Skipping message from producer..."
+                )
+
+                continue
 
             if not self.__game_id or self.__game_id == 0:
                 self.__game_id = review.game_id
@@ -73,17 +83,16 @@ class ReviewConsumer(ConsumerBase):
             self.__messages.append(review)
         else:
             self.__process_batch()
-            game_id = self.__game_id
             result = self.__result
             self.__clean_up_process()
 
-            return True, game_id, result
+            return True, result
 
     def close(self) -> None:
         self.__consumer.close()
         self.__logger.info("Shut down review consumer")
 
-    def get_output(self) -> dict[str, tuple[float, float]]:
+    def get_output(self) -> MapreduceDto:
         self.__logger.info(self.__result)
         return self.__result
 
@@ -96,12 +105,18 @@ class ReviewConsumer(ConsumerBase):
         self.__hdfs_service.upload_file_to_hdfs(filename=temp_review_filename, game_id=self.__game_id)
 
         self.__mapreduce_service.run_mapreduce_subprocess(game_id=self.__game_id)
-        self.__result = self.__mapreduce_service.get_mapreduce_result(self.__game_id)
+        result = self.__mapreduce_service.get_mapreduce_result(self.__game_id)
+        self.__result = MapreduceDto(
+            game_id=self.__game_id,
+            correlation_id=self.__correlation_id,
+            recommendations=result
+        )
 
         self.__hdfs_service.clear_directory(game_id=self.__game_id, directory_type=HdfsDirectoryType.INPUT)
         self.__hdfs_service.clear_directory(game_id=self.__game_id, directory_type=HdfsDirectoryType.OUTPUT)
 
     def __clean_up_process(self) -> None:
         self.__game_id = 0
+        self.__correlation_id = None
         self.__messages = []
-        self.__result = {}
+        self.__result = None
