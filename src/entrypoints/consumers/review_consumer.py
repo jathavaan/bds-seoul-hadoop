@@ -19,10 +19,10 @@ class ReviewConsumer(ConsumerBase):
     __mapreduce_service: MapreduceService
 
     __consumer: Consumer
-    __game_id: int
-    __correlation_id: str | None
-    __messages: list[Review]
-    __result: MapreduceDto | None
+    __game_id: int = 0
+    __correlation_id: str | None = None
+    __messages: list[Review] = []
+    __result: MapreduceDto | None = None
 
     def __init__(self):
         container = Container()
@@ -32,8 +32,6 @@ class ReviewConsumer(ConsumerBase):
         self.__hdfs_service = container.hdfs_service()
         self.__mapreduce_service = container.mapreduce_service()
 
-        self.__game_id = 0
-        self.__messages = []
         topics = [Config.KAFKA_REVIEW_TOPIC.value]
         self.__consumer = Consumer({
             "bootstrap.servers": Config.KAFKA_BOOTSTRAP_SERVERS.value,
@@ -49,7 +47,8 @@ class ReviewConsumer(ConsumerBase):
         )
 
     def consume(self) -> tuple[bool, MapreduceDto]:
-        while len(self.__messages) < Config.HADOOP_BATCH_SIZE.value:
+        is_last_review = False
+        while len(self.__messages) < Config.HADOOP_BATCH_SIZE.value and not is_last_review:
             message = self.__consumer.poll(Config.KAFKA_POLL_TIMEOUT.value)
 
             if not message:
@@ -61,6 +60,7 @@ class ReviewConsumer(ConsumerBase):
 
             review_data = json.loads(message.value().decode("utf-8"))
             review = Review(**review_data)
+            is_last_review = review.is_last_review
 
             if self.__correlation_id is None:
                 self.__correlation_id = review.correlation_id
@@ -106,7 +106,11 @@ class ReviewConsumer(ConsumerBase):
 
         self.__mapreduce_service.run_mapreduce_subprocess(game_id=self.__game_id)
         result = self.__mapreduce_service.get_mapreduce_result(self.__game_id)
-        self.__result = MapreduceDto(game_id=self.__game_id, correlation_id=self.__correlation_id, result=result)
+        self.__result = MapreduceDto(
+            game_id=self.__game_id,
+            correlation_id=self.__correlation_id,
+            recommendations=result
+        )
 
         self.__hdfs_service.clear_directory(game_id=self.__game_id, directory_type=HdfsDirectoryType.INPUT)
         self.__hdfs_service.clear_directory(game_id=self.__game_id, directory_type=HdfsDirectoryType.OUTPUT)

@@ -5,11 +5,11 @@
 class MapreduceDto:
     game_id: int
     correlation_id: str
-    result: dict[str, tuple[float, float]]
+    recommendations: dict[str, tuple[float, float]]
 
     def to_dict(self) -> dict[str, int | str | dict[str, tuple[float, float]]]:
         return {
             "game_id": self.game_id,
             "correlation_id": self.correlation_id,
-            "result": self.result
+            "recommendations": self.recommendations
         }

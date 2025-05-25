@@ -7,9 +7,9 @@ if __name__ == "__main__":
 
     try:
         while True:
-            is_batch_ready, game_id, result = consumer.consume()
+            is_batch_ready, result = consumer.consume()
             if is_batch_ready:
-                producer.produce(game_id=game_id, producer_input=result)
+                producer.produce(producer_input=result)
                 is_batch_ready = False
 
     except KeyboardInterrupt:
