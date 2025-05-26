@@ -1,6 +1,8 @@
 ﻿services:
   namenode:
-    build: .
+    build:
+      context: .
+      dockerfile: ${DOCKER_FILE}
     container_name: namenode
     hostname: namenode
     env_file: .env
@@ -17,7 +19,9 @@
       - .:/app
 
   datanode:
-    build: .
+    build:
+      context: .
+      dockerfile: ${DOCKER_FILE}
     container_name: datanode
     hostname: datanode
     env_file: .env
