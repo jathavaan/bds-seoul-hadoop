@@ -17,7 +17,6 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 RUN curl -fsSL \
       https://archive.apache.org/dist/hadoop/common/hadoop-${HADOOP_VERSION}/hadoop-${HADOOP_VERSION}.tar.gz \
     | tar -xz -C /opt/ \
-  && mv /opt/hadoop-${HADOOP_VERSION} ${HADOOP_HOME} \
   && rm -rf ${HADOOP_HOME}/share/doc/hadoop
 
 # Install gettext (for envsubst) and build tools for Python/OpenSSL
