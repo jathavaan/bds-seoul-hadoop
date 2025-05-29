@@ -37,7 +37,8 @@ class ReviewConsumer(ConsumerBase):
             "bootstrap.servers": Config.KAFKA_BOOTSTRAP_SERVERS.value,
             "group.id": Config.KAFKA_GROUP_ID.value,
             "auto.offset.reset": "earliest",
-            "enable.auto.commit": True
+            "enable.auto.commit": True,
+            "max.poll.interval.ms": Config.KAFKA_MAX_POLL_TIMEOUT.value
         })
 
         self.__consumer.subscribe(topics)
@@ -48,7 +49,7 @@ class ReviewConsumer(ConsumerBase):
 
     def consume(self) -> tuple[bool, MapreduceDto]:
         is_last_review = False
-        while len(self.__messages) < Config.HADOOP_BATCH_SIZE.value and not is_last_review:
+        while not is_last_review:
             message = self.__consumer.poll(Config.KAFKA_POLL_TIMEOUT.value)
 
             if not message:

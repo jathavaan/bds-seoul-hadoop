@@ -20,6 +20,7 @@ class Config(Enum):
     KAFKA_REVIEW_TOPIC = "reviews"
     KAFKA_MR_RESULT_TOPIC = "mapreduce_results"
     KAFKA_POLL_TIMEOUT = 0.5
+    KAFKA_MAX_POLL_TIMEOUT = 86400000
 
     # Hadoop
     HDFS_CONNECTION_STRING = f"http://{os.getenv('HDFS_HOST_IP')}:9870"
