@@ -9,7 +9,7 @@ load_dotenv()
 
 class Config(Enum):
     # Logger
-    LOGGING_LEVEL = logging.DEBUG
+    LOGGING_LEVEL = logging.INFO
     LOGGER_WIDTH_OFFSET = 90
     SEQ_URL = f"http://{os.getenv('SEQ_SERVER')}:{os.getenv('SEQ_PORT')}"
     SEQ_LOG_BATCH_SIZE = 1
@@ -21,6 +21,8 @@ class Config(Enum):
     KAFKA_MR_RESULT_TOPIC = "mapreduce_results"
     KAFKA_POLL_TIMEOUT = 0.5
     KAFKA_MAX_POLL_TIMEOUT = 86400000
+    KAFKA_HEARTBEAT_INTERVAL = 3000
+    KAFKA_SESSION_TIMEOUT = 120000
 
     # Hadoop
     HDFS_CONNECTION_STRING = f"http://{os.getenv('HDFS_HOST_IP')}:9870"

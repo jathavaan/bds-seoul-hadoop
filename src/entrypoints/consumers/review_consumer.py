@@ -1,5 +1,6 @@
 ﻿import json
 import logging
+from statistics import correlation
 
 from confluent_kafka import Consumer
 
@@ -38,7 +39,9 @@ class ReviewConsumer(ConsumerBase):
             "group.id": Config.KAFKA_GROUP_ID.value,
             "auto.offset.reset": "earliest",
             "enable.auto.commit": True,
-            "max.poll.interval.ms": Config.KAFKA_MAX_POLL_TIMEOUT.value
+            "session.timeout.ms": Config.KAFKA_SESSION_TIMEOUT.value,
+            "max.poll.interval.ms": Config.KAFKA_MAX_POLL_TIMEOUT.value,
+            "heartbeat.interval.ms": Config.KAFKA_HEARTBEAT_INTERVAL.value
         })
 
         self.__consumer.subscribe(topics)
@@ -62,6 +65,10 @@ class ReviewConsumer(ConsumerBase):
             review_data = json.loads(message.value().decode("utf-8"))
             review = Review(**review_data)
             is_last_review = review.is_last_review
+
+            self.__logger.debug(
+                f"Received the following message with correlation ID {review.correlation_id}: {review_data}"
+            )
 
             if self.__correlation_id is None:
                 self.__correlation_id = review.correlation_id
