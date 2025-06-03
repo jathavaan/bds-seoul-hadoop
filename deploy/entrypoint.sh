@@ -4,7 +4,7 @@ echo "Starting Hadoop entrypoint for ROLE=$ROLE"
 
 echo "Preparing environment..."
 set -a
-source /opt/.hadoop.env
+source /app/.env
 set +a
 
 # Generate Hadoop configuration files

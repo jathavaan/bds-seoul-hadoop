@@ -1,7 +1,7 @@
 #!/bin/bash
 
 set -a
-source /opt/.hadoop.env
+source /app/.env
 set +a
 
 HADOOP_HOME=${HADOOP_HOME:-/opt/hadoop-3.2.1}
