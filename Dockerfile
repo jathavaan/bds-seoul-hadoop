@@ -1,6 +1,6 @@
 ﻿FROM bde2020/hadoop-base:2.0.0-hadoop3.2.1-java8
 
-ENV JAVA_HOME=/usr/lib/jvm/java-8-openjdk-amd64
+ENV JAVA_HOME=/usr/lib/jvm/java-1.8.0-openjdk-amd64
 
 ENV HADOOP_HOME=/opt/hadoop-3.2.1
 ENV HADOOP_CONF_DIR=$HADOOP_HOME/etc/hadoop
