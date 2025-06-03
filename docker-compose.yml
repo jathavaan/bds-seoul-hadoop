@@ -1,6 +1,10 @@
-﻿services:
+﻿version: "3.8"
+
+services:
   namenode:
-    build: .
+    build:
+      context: .
+      dockerfile: dockerfiles/namenode.dockerfile
     container_name: namenode
     hostname: namenode
     env_file: .env
@@ -9,15 +13,20 @@
       ROLE: ${NAMENODE_ROLE}
       HOST_ID: ${HDFS_HOST_IP}
     ports:
-      - "9870:9870"
-      - "9000:9000"
+      - "9870:9870"   # NameNode HTTP/WebHDFS
+      - "9000:9000"   # NameNode RPC
     volumes:
       - namenode-data:/hadoop/dfs/name
-      - ./hadoop/.hadoop.env:/opt/.hadoop.env:ro
-      - .:/app
+      - ./main.py:/app/main.py
+      - ./requirements.txt:/app/requirements.txt
+      - ./src:/app/src
+      - ./.env:/app/.env:ro
+      - ./reviews:/app/reviews
 
   datanode:
-    build: .
+    build:
+      context: .
+      dockerfile: dockerfiles/datanode.dockerfile
     container_name: datanode
     hostname: datanode
     env_file: .env
@@ -25,7 +34,6 @@
       ROLE: ${DATANODE_ROLE}
     volumes:
       - datanode-data:/hadoop/dfs/data
-      - ./hadoop/.hadoop.env:/opt/.hadoop.env:ro
 
 volumes:
   namenode-data:
