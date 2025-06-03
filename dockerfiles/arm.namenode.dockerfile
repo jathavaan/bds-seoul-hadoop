@@ -1,6 +1,8 @@
 ﻿FROM arm64v8/openjdk:8-jdk-slim
+
 # Point JAVA_HOME at ARM64’s OpenJDK install
-ENV JAVA_HOME=/usr/lib/jvm/java-8-openjdk-arm64
+ARG JAVA_HOME_PATH
+ENV JAVA_HOME=${JAVA_HOME_PATH}
 ENV PATH=$JAVA_HOME/bin:$PATH
 
 # Set up Hadoop
