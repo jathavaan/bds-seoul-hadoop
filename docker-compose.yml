@@ -2,7 +2,9 @@
   namenode:
     build:
       context: .
-      dockerfile: dockerfiles/namenode.dockerfile
+      args:
+        JAVA_HOME_PATH: ${JAVA_HOME_PATH}
+      dockerfile: dockerfiles/${ARCHITECTURE}.namenode.dockerfile
     container_name: namenode
     hostname: namenode
     env_file: .env
@@ -24,7 +26,9 @@
   datanode:
     build:
       context: .
-      dockerfile: dockerfiles/datanode.dockerfile
+      args:
+        JAVA_HOME_PATH: ${JAVA_HOME_PATH}
+      dockerfile: dockerfiles/${ARCHITECTURE}.datanode.dockerfile
     container_name: datanode
     hostname: datanode
     env_file: .env
