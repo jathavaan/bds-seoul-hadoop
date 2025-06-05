@@ -86,9 +86,7 @@ RUN git clone https://github.com/confluentinc/librdkafka.git \
   && cd .. && rm -rf librdkafka
 
 # Install the Python bindings for confluent-kafka
-RUN python -m ensurepip && \
-    python -m pip install --upgrade pip setuptools wheel && \
-    pip install --no-binary :all: confluent-kafka
+RUN pip install --no-binary :all: confluent-kafka
 
 # Copy over your templates, scripts, and MapReduce code
 COPY hadoop/templates/ /opt/templates/
