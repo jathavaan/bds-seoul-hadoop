@@ -1,16 +1,16 @@
 ﻿import json
 import logging
-from statistics import correlation
 
 from confluent_kafka import Consumer
 
 from src import Config
-from src.application import Container
 from src.application.services.file_service import FileService
 from src.application.services.hadoop_service import HdfsService, HdfsDirectoryType
 from src.application.services.mapreduce_service import MapreduceService, MapreduceDto
 from src.domain import Review
+from src.domain.enums import ProcessType, ProcessStatus
 from src.entrypoints.base import ConsumerBase
+from src.entrypoints.producers import ProcessStatusProducer
 
 
 class ReviewConsumer(ConsumerBase):
@@ -18,6 +18,7 @@ class ReviewConsumer(ConsumerBase):
     __file_service: FileService
     __hdfs_service: HdfsService
     __mapreduce_service: MapreduceService
+    __process_status_producer: ProcessStatusProducer
 
     __consumer: Consumer
     __game_id: int = 0
@@ -25,13 +26,19 @@ class ReviewConsumer(ConsumerBase):
     __messages: list[Review] = []
     __result: MapreduceDto | None = None
 
-    def __init__(self):
-        container = Container()
-
-        self.__logger = container.logger()
-        self.__file_service = container.file_service()
-        self.__hdfs_service = container.hdfs_service()
-        self.__mapreduce_service = container.mapreduce_service()
+    def __init__(
+            self,
+            logger: logging.Logger,
+            file_service: FileService,
+            hdfs_service: HdfsService,
+            mapreduce_service: MapreduceService,
+            process_status_producer: ProcessStatusProducer
+    ):
+        self.__logger = logger
+        self.__file_service = file_service
+        self.__hdfs_service = hdfs_service
+        self.__mapreduce_service = mapreduce_service
+        self.__process_status_producer = process_status_producer
 
         topics = [Config.KAFKA_REVIEW_TOPIC.value]
         self.__consumer = Consumer({
@@ -90,9 +97,11 @@ class ReviewConsumer(ConsumerBase):
 
             self.__messages.append(review)
         else:
+            self.__process_status_producer.produce((self.__game_id, ProcessType.MAPREDUCE, ProcessStatus.IN_PROGRESS))
             self.__process_batch()
             result = self.__result
             self.__clean_up_process()
+            self.__process_status_producer.produce((self.__game_id, ProcessType.MAPREDUCE, ProcessStatus.COMPLETED))
 
             return True, result
 

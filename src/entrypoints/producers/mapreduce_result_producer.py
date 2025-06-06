@@ -13,9 +13,8 @@ class MapreduceReduceResultProducer(ProducerBase[MapreduceDto]):
     __logger: logging.Logger
     __producer: Producer
 
-    def __init__(self):
-        container = Container()
-        self.__logger = container.logger()
+    def __init__(self, logger: logging.Logger):
+        self.__logger = logger
         self.__producer = Producer({"bootstrap.servers": Config.KAFKA_BOOTSTRAP_SERVERS.value})
 
     def produce(self, producer_input: MapreduceDto) -> bool:
