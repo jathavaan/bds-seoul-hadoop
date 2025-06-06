@@ -14,10 +14,10 @@ ENV PATH=${PATH}:${HADOOP_HOME}/bin:${HADOOP_HOME}/sbin
 # Install prerequisites for Hadoop download & unpack
 RUN apt-get update && apt-get install -y --no-install-recommends \
     curl \
+    gettext-base \
     ca-certificates \
     tar \
   && rm -rf /var/lib/apt/lists/*
-
 # Download & extract Hadoop
 RUN curl -fsSL \
       https://archive.apache.org/dist/hadoop/common/hadoop-${HADOOP_VERSION}/hadoop-${HADOOP_VERSION}.tar.gz \
