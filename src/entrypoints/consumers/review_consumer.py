@@ -97,11 +97,9 @@ class ReviewConsumer(ConsumerBase):
 
             self.__messages.append(review)
         else:
-            self.__process_status_producer.produce((self.__game_id, ProcessType.MAPREDUCE, ProcessStatus.IN_PROGRESS))
             self.__process_batch()
             result = self.__result
             self.__clean_up_process()
-            self.__process_status_producer.produce((self.__game_id, ProcessType.MAPREDUCE, ProcessStatus.COMPLETED))
 
             return True, result
 
@@ -114,8 +112,10 @@ class ReviewConsumer(ConsumerBase):
         return self.__result
 
     def __process_batch(self) -> None:
+        self.__process_status_producer.produce((self.__game_id, ProcessType.MAPREDUCE, ProcessStatus.IN_PROGRESS))
         if not self.__messages:
             self.__logger.warning(f"No messages to process for game {self.__game_id}")
+            self.__process_status_producer.produce((self.__game_id, ProcessType.MAPREDUCE, ProcessStatus.COMPLETED))
             return
 
         temp_review_filename = self.__file_service.write_to_file(reviews=self.__messages)
@@ -131,6 +131,8 @@ class ReviewConsumer(ConsumerBase):
 
         self.__hdfs_service.clear_directory(game_id=self.__game_id, directory_type=HdfsDirectoryType.INPUT)
         self.__hdfs_service.clear_directory(game_id=self.__game_id, directory_type=HdfsDirectoryType.OUTPUT)
+        self.__file_service.delete_file(game_id=self.__game_id)
+        self.__process_status_producer.produce((self.__game_id, ProcessType.MAPREDUCE, ProcessStatus.COMPLETED))
 
     def __clean_up_process(self) -> None:
         self.__game_id = 0

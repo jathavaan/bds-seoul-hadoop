@@ -17,8 +17,11 @@ class Config(Enum):
     # Kafka
     KAFKA_BOOTSTRAP_SERVERS = f"{os.getenv('KAFKA_BOOTSTRAP_SERVERS')}:9092"
     KAFKA_GROUP_ID = "seoul"
+
     KAFKA_REVIEW_TOPIC = "reviews"
     KAFKA_MR_RESULT_TOPIC = "mapreduce_results"
+    KAFKA_PROCESS_STATUS_TOPIC = "process_status"
+
     KAFKA_POLL_TIMEOUT = 0.5
     KAFKA_MAX_POLL_TIMEOUT = 86400000
     KAFKA_HEARTBEAT_INTERVAL = 3000

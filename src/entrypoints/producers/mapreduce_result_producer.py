@@ -4,7 +4,6 @@ import logging
 from confluent_kafka import Producer
 
 from src import Config
-from src.application import Container
 from src.application.services.mapreduce_service import MapreduceDto
 from src.entrypoints.base import ProducerBase
 

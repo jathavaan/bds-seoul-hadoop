@@ -5,6 +5,7 @@ from src.application.common import Logger
 from src.application.services.file_service import FileService
 from src.application.services.hadoop_service.hdfs_service import HdfsService
 from src.application.services.mapreduce_service import MapreduceService
+from src.entrypoints.producers import ProcessStatusProducer
 
 
 class Container(containers.DeclarativeContainer):
@@ -12,3 +13,4 @@ class Container(containers.DeclarativeContainer):
     hdfs_service = providers.Singleton(HdfsService, logger=logger)
     mapreduce_service = providers.Singleton(MapreduceService, logger=logger, hdfs_service=hdfs_service)
     file_service = providers.Singleton(FileService, logger=logger)
+    process_status_producer = providers.Singleton(ProcessStatusProducer, logger=logger)
