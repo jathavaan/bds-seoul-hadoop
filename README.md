@@ -1,85 +1,165 @@
-﻿# RaspberryPi's with Hadoop Distributed File System and MapReduce
+﻿# Big Data Systems Team Seoul - Hadoop Namenode and Datanodes
 
-This repo contains the MapReduce logic for the Big Data Systems project at Pusan National University. The repos
-in this project can be found at below:
+This repository starts the Hadoop namenode and datanode containers, and runs MapReduce jobs implemented in Python. Is
+build using Docker and Docker Compose. Since the fourth Raspberry Pi is corrupted, this repository simulates nodes in
+the cluster. This way we still have a working cluster with four nodes, but one is simulated.
 
-- [Client](https://github.com/jathavaan/bds-seoul-client)
-- [MariaDB](https://github.com/jathavaan/bds-seoul-mariadb)
-- [Hadoop](https://github.com/jathavaan/bds-seoul-hadoop)
+> [!NOTE]
+> Make sure the `bds-seoul-mariadb` project is up and running before starting this project. This is step two in a three
+> step startup process. The correct order is:
+> 1. [bds-seoul-mariadb](https://github.com/jatavaan/bds-seoul-mariadb)
+> 2. [bds-seoul-hadoop](https://github.com/jathavaan/bds-seoul-hadoop)
+> 3. [bds-seoul-client](https://github.com/jathavaan/bds-seoul-client)
 
-The goal of the project is to scrape data from a website, in our case [Steam](https://steampowered.com/) and process the
-data in a distributed system. The project is deployed on a cluster of four RaspberryPi's, and this repo holds the source
-code for two of them. We have two nodes dedicated to Hadoop, where one is a namenode and datanode, and the other is only
-a datanode. The code that can be found in this repo does the following:
+## Table of Contents
 
-- Listen to a Kafka topic from the scraper
-- Batch and upload reviews to HDFS
-- MapReduce job on the incoming data
-- Publishes the results to a Kafka topic
+- [Table of Contents](#table-of-contents)
+- [Prerequisites](#prerequisites)
+- [Installation](#installation)
+- [Setup](#setup)
+    - [Local setup](#local-setup)
+    - [Raspberry Pi setup](#raspberry-pi-setup)
+    - [Starting the Services](#starting-the-services)
 
-## Dependencies
+## Prerequisites
 
-Ensure that Kafka, Zookeeper, MariaDB and Seq is up and running before starting this Pi. If you are running on a local
-machine ensure that the containers in `bds-seoul-mariadb`-repo is up and running.
+- [Docker Desktop](https://docs.docker.com/desktop/)
+- [Python 3.11](https://www.python.org/downloads/release/python-3110/)
+
+## Installation
+
+1. Clone the repository:
+
+   ```powershell
+   git clone https://github.com/jathavaan/bds-seoul-hadoop.git
+   ```
+
+2. Navigate to the project directory:
+
+   ```powershell
+    cd bds-seoul-hadoop
+    ```
 
 ## Setup
 
-Make sure to add `.env` in the root directory. It should look like this for local development
+There are two different setups for this project: one for local development and one for running on Raspberry Pis.
+
+### Local setup
+
+Create a `.env` file in the root directory with the following content:
 
 ```dotenv
-ROLE=local
-NAMENODE_ROLE=namenode
-DATANODE_ROLE=datanode
-DOCKER_FILE=x86.Dockerfile
+ARCHITECTURE=x86
 HDFS_HOST_IP=namenode
 KAFKA_BOOTSTRAP_SERVERS=host.docker.internal
 SEQ_SERVER=host.docker.internal
 SEQ_PORT=5341
-```
 
-and in the folder `hadoop` add `.hadoop.env` which for the local development should look like this
-
-```dotenv
 NAMENODE_IP=namenode
 DATANODE_IP=datanode
+NAMENODE_ROLE=namenode
+DATANODE_ROLE=datanode
 
-DFS_REPLICATION=2
+DFS_REPLICATION=1
 HDFS_NAMENODE_USER=root
 HDFS_DATANODE_USER=root
 HDFS_SECONDARYNAMENODE_USER=root
+
+JAVA_HOME_PATH=/usr/lib/jvm/java-1.8.0-openjdk-amd64
 ```
 
-For the `.env` file `NAMENODE_ROLE` and `DATANODE_ROLE` should be substituted with `ROLE` which should either have the
-value `namenode` or `datanode` when configuring the production environment. In `.hadoop.env` the keys `*_ROLE` should
-have the respective IP-addresses as values.
+If your local machine is an ARM64 architecture (like Apple Silicon), you have to use `arm.*.dockerfile` instead. Also
+change the `JAVA_HOME_PATH` as shown below:
 
-The Python code have to run inside a container. Simply run `docker-compose up -d`.
+```dotenv
+ARCHITECTURE=arm
+JAVA_HOME_PATH=/usr/local/openjdk-8
+```
 
-## Running the code
+See the section about [Starting the Services](#starting-the-services) for information on how to this system.
+
+### Raspberry Pi setup
+
+> [!NOTE]
+> This takes over 2 hours depending on your internet connection. It is therefore recommended to run this project
+> locally.
+
+The Raspberry Pi setup is more complex and requires multiple Raspberry Pis to be set up. The first step is to identify
+the IP-addresses of the Raspberry Pis. Open a terminal on your computer and ssh into the Raspberry Pi:
 
 ```powershell
-docker-compose start
+ssh seoul-3@<ip-address-of-raspberry-pi-3>
 ```
 
-and if you want to rerun with changes in the code
+Replace `<ip-address-of-raspberry-pi-3>` with the actual IP-address of the Raspberry Pi, and enter the password
+`seoul-3`.
+
+Then change directory into the `bds-seoul-mariadb` directory:
 
 ```powershell
-docker-compose restart
+cd bds-seoul-hadoop
 ```
 
-## Rebuilding containers
-
-> [!WARNING] Note that this takes some time (10~20 minutes)
+We use `envsubst` to inject the correct IP-addresses when building the docker images. The IP-addresses are set in
+`~/.zshrc`. To set the IP-addresses, you can use `nano ~/.zshrc` and add the following lines:
 
 ```powershell
-docker-compose down -v; docker-compose build --no-cache; docker-compose up -d
+export SEOUL_1_IP=<ip-address-of-seoul-1-raspberry-pi>
+export SEOUL_2_IP=<ip-address-of-seoul-2-raspberry-pi>
+export SEOUL_3_IP=<ip-address-of-seoul-3-raspberry-pi>
+export SEOUL_4_IP=<ip-address-of-seoul-4-raspberry-pi>
 ```
 
-## Logs
+Press `CTRL + X`, then `Y` and `Enter` to save the file. After that, run
 
-The logs for this node along with the other nodes in the cluster can be viewed
-using [Seq](http://host.docker.internal:5341/#/events?range=1d). You have to provide username and password the first
-time you open Seq:
+```bash
+source ~/.zshrc
+``` 
 
-- Username: `admin`
-- Password: `admin`
+to apply the changes. You have now set the IP-addresses for the Raspberry Pis, and you only need to do this if the
+IP-addresses of any Raspberry Pi changes.
+
+Using `envsubst`, you can now configure the correct `.env` file. Simply run the following command in the root of
+`bds-seoul-mariadb` directory:
+
+```powershell
+envsubst < .env.template > .env
+```
+
+This will create a `.env` file with the correct IP-addresses for the Raspberry Pis. Run
+
+```bash
+cat .env
+``` 
+
+to verify that the
+environment variables are set correctly. The docker images are now ready to be built. Build and start the containers and
+force recreating with the following command:
+
+### Starting the Services
+
+> [!NOTE]
+> If you are doing this on a Raspberry Pi, use `sudo docker compose` instead of `docker-compose`.
+
+The next step is to create the containers by running the following command in the root of `bds-seoul-mariadb` directory:
+
+```powershell
+docker-compose up -d
+```
+
+When the containers are up and running, you can check the logs of the containers by running
+
+```powershell
+docker-compose logs -f
+```
+
+When you see the logs
+
+```plaintext
+[INFO] 2025-06-09 05:29:53 application.services.hadoop_service.hdfs_service:37            Successfully connected to namenode
+[INFO] 2025-06-09 05:29:54 application.services.hadoop_service.hdfs_service:70            HDFS is out of safe mode. Proceeding...
+[INFO] 2025-06-09 05:29:54 entrypoints.consumers.review_consumer:55                       Kafka Consumer connected to bootstrap server [host.docker.internal:9092] with group ID seoul, subscribed to topic(s): reviews
+```
+
+you can be sure that the containers are up and running. You may now run the containers in `bds-seoul-client` to complete
+the setup. See the guide in the [repository](https://bds-seoul-client) for more information.
