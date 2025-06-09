@@ -27,8 +27,9 @@ class FileService:
 
     def get_filepaths(self, game_id: int) -> list[str]:
         return [
-            filepath for filepath in os.listdir(Config.TEMP_FILE_STORAGE_DIR.value)
-            if filepath.endswith(".txt") and str(game_id) in filepath
+            os.path.join(Config.TEMP_FILE_STORAGE_DIR.value, file)
+            for file in os.listdir(Config.TEMP_FILE_STORAGE_DIR.value)
+            if file.endswith(".txt") and str(game_id) in file
         ]
 
     def delete_file(self, game_id: int) -> bool:

@@ -1,4 +1,4 @@
-﻿<configuration>
+<configuration>
     <property>
         <name>dfs.replication</name>
         <value>${DFS_REPLICATION}</value>

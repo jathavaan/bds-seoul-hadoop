@@ -1,10 +1,10 @@
-﻿version: "3.8"
-
-services:
+﻿services:
   namenode:
     build:
       context: .
-      dockerfile: dockerfiles/namenode.dockerfile
+      args:
+        JAVA_HOME_PATH: ${JAVA_HOME_PATH}
+      dockerfile: dockerfiles/${ARCHITECTURE}.namenode.dockerfile
     container_name: namenode
     hostname: namenode
     env_file: .env
@@ -13,8 +13,8 @@ services:
       ROLE: ${NAMENODE_ROLE}
       HOST_ID: ${HDFS_HOST_IP}
     ports:
-      - "9870:9870"   # NameNode HTTP/WebHDFS
-      - "9000:9000"   # NameNode RPC
+      - "9870:9870"
+      - "9000:9000"
     volumes:
       - namenode-data:/hadoop/dfs/name
       - ./main.py:/app/main.py
@@ -26,7 +26,9 @@ services:
   datanode:
     build:
       context: .
-      dockerfile: dockerfiles/datanode.dockerfile
+      args:
+        JAVA_HOME_PATH: ${JAVA_HOME_PATH}
+      dockerfile: dockerfiles/${ARCHITECTURE}.datanode.dockerfile
     container_name: datanode
     hostname: datanode
     env_file: .env
