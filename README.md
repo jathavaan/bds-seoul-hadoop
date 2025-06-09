@@ -1,62 +1,96 @@
-﻿# RaspberryPi's with Hadoop Distributed File System and MapReduce
+﻿# Big Data Systems Team Seoul - Hadoop Namenode and Datanodes
 
-This repo contains the MapReduce logic for the Big Data Systems project at Pusan National University. The repos
-in this project can be found at below:
+This repository starts the Hadoop namenode and datanode containers, and runs MapReduce jobs implemented in Python. Is
+build using Docker and Docker Compose. Since the fourth Raspberry Pi is corrupted, this repository simulates nodes in
+the cluster. This way we still have a working cluster with four nodes, but one is simulated.
 
-- [Client](https://github.com/jathavaan/bds-seoul-client)
-- [MariaDB](https://github.com/jathavaan/bds-seoul-mariadb)
-- [Hadoop](https://github.com/jathavaan/bds-seoul-hadoop)
+> [!NOTE]
+> Make sure the `bds-seoul-mariadb` project is up and running before starting this project. This is step two in a three
+> step startup process. The correct order is:
+> 1. [bds-seoul-mariadb](https://github.com/jatavaan/bds-seoul-mariadb)
+> 2. [bds-seoul-hadoop](https://github.com/jathavaan/bds-seoul-hadoop)
+> 3. [bds-seoul-client](https://github.com/jathavaan/bds-seoul-client)
 
-The goal of the project is to scrape data from a website, in our case [Steam](https://steampowered.com/) and process the
-data in a distributed system. The project is deployed on a cluster of four RaspberryPi's, and this repo holds the source
-code for two of them. We have two nodes dedicated to Hadoop, where one is a namenode and datanode, and the other is only
-a datanode. The code that can be found in this repo does the following:
+## Table of Contents
 
-- Listen to a Kafka topic from the scraper
-- Batch and upload reviews to HDFS
-- MapReduce job on the incoming data
-- Publishes the results to a Kafka topic
+- [Prerequisites](#prerequisites)
+- [Setup](#setup)
+    - [Local Setup](#local-setup)
+    - [Raspberry Pi Setup](#raspberry-pi-setup)
+    - [Starting the Services](#starting-the-services)
+    - [Running the MapReduce Job](#running-the-mapreduce-job)
+- [Rebuilding Containers](#rebuilding-containers)
+- [Logs](#logs)
 
-## Dependencies
+## Prerequisites
 
-Ensure that Kafka, Zookeeper, MariaDB and Seq is up and running before starting this Pi. If you are running on a local
-machine ensure that the containers in `bds-seoul-mariadb`-repo is up and running.
+- [Docker Desktop](https://docs.docker.com/desktop/)
+- [Python 3.11](https://www.python.org/downloads/release/python-3110/)
+
+## Installation
+
+1. Clone the repository:
+
+   ```powershell
+   git clone https://github.com/jathavaan/bds-seoul-hadoop.git
+   ```
+
+2. Navigate to the project directory:
+
+   ```powershell
+    cd bds-seoul-hadoop
+    ```
 
 ## Setup
 
-Make sure to add `.env` in the root directory. It should look like this for local development
+There are two different setups for this project: one for local development and one for running on Raspberry Pis.
+
+### Local Setup
+
+Create a `.env` file in the root directory with the following content:
 
 ```dotenv
-ROLE=local
-NAMENODE_ROLE=namenode
-DATANODE_ROLE=datanode
+ARCHITECTURE=x86
 HDFS_HOST_IP=namenode
 KAFKA_BOOTSTRAP_SERVERS=host.docker.internal
-SEQ_LOG_SERVER=host.docker.internal
-```
+SEQ_SERVER=host.docker.internal
+SEQ_PORT=5341
 
-and in the folder `hadoop` add `.hadoop.env` which for the local development should look like this
-
-```dotenv
 NAMENODE_IP=namenode
 DATANODE_IP=datanode
+NAMENODE_ROLE=namenode
+DATANODE_ROLE=datanode
 
 DFS_REPLICATION=2
 HDFS_NAMENODE_USER=root
 HDFS_DATANODE_USER=root
 HDFS_SECONDARYNAMENODE_USER=root
+
+JAVA_HOME_PATH=/usr/lib/jvm/java-1.8.0-openjdk-amd64
 ```
 
-For the `.env` file `NAMENODE_ROLE` and `DATANODE_ROLE` should be substituted with `ROLE` which should either have the
-value `namenode` or `datanode` when configuring the production environment. In `.hadoop.env` the keys `*_ROLE` should
-have the respective IP-addresses as values.
+If your local machine is an ARM64 architecture (like Apple Silicon), you can use the `arm64.Dockerfile` instead:
 
-The Python code have to run inside a container. Simply run `docker-compose up -d`.
+```dotenv
+DOCKER_FILE=arm64.Dockerfile
+```
 
-## Running the code
+### Raspberry Pi Setup
 
-```powershell
-docker-compose start
+SSH into the Raspberry Pi and clone the repository:
+
+```bash
+git clone https://github.com/jathavaan/bds-seoul-hadoop.git
+cd bds-seoul-hadoop
+```
+
+Set the IP addresses of the Raspberry Pis in your shell profile (`~/.zshrc` or `~/.bashrc`):
+
+```bash
+export SEOUL_1_IP=<ip-of-seoul-1>
+export SEOUL_2_IP=<ip-of-seoul-2>
+export SEOUL_3_IP=<ip-of-seoul-3>
+export SEOUL_4_IP=<ip-of-seoul-4>
 ```
 
 and if you want to rerun with changes in the code
