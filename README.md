@@ -30,9 +30,11 @@ Make sure to add `.env` in the root directory. It should look like this for loca
 ROLE=local
 NAMENODE_ROLE=namenode
 DATANODE_ROLE=datanode
+DOCKER_FILE=x86.Dockerfile
 HDFS_HOST_IP=namenode
 KAFKA_BOOTSTRAP_SERVERS=host.docker.internal
-SEQ_LOG_SERVER=host.docker.internal
+SEQ_SERVER=host.docker.internal
+SEQ_PORT=5341
 ```
 
 and in the folder `hadoop` add `.hadoop.env` which for the local development should look like this
