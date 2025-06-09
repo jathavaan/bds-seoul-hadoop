@@ -13,14 +13,13 @@ the cluster. This way we still have a working cluster with four nodes, but one i
 
 ## Table of Contents
 
+- [Table of Contents](#table-of-contents)
 - [Prerequisites](#prerequisites)
+- [Installation](#installation)
 - [Setup](#setup)
-    - [Local Setup](#local-setup)
-    - [Raspberry Pi Setup](#raspberry-pi-setup)
+    - [Local setup](#local-setup)
+    - [Raspberry Pi setup](#raspberry-pi-setup)
     - [Starting the Services](#starting-the-services)
-    - [Running the MapReduce Job](#running-the-mapreduce-job)
-- [Rebuilding Containers](#rebuilding-containers)
-- [Logs](#logs)
 
 ## Prerequisites
 
@@ -45,7 +44,7 @@ the cluster. This way we still have a working cluster with four nodes, but one i
 
 There are two different setups for this project: one for local development and one for running on Raspberry Pis.
 
-### Local Setup
+### Local setup
 
 Create a `.env` file in the root directory with the following content:
 
@@ -76,6 +75,8 @@ change the `JAVA_HOME_PATH` as shown below:
 ARCHITECTURE=arm
 JAVA_HOME_PATH=/usr/local/openjdk-8
 ```
+
+See the section about [Starting the Services](#starting-the-services) for information on how to this system.
 
 ### Raspberry Pi setup
 
