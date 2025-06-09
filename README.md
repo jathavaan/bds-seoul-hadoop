@@ -7,7 +7,7 @@ the cluster. This way we still have a working cluster with four nodes, but one i
 > [!NOTE]
 > Make sure the `bds-seoul-mariadb` project is up and running before starting this project. This is step two in a three
 > step startup process. The correct order is:
-> 1. [bds-seoul-mariadb](https://github.com/jatavaan/bds-seoul-mariadb)
+> 1. [bds-seoul-mariadb](https://github.com/jathavaan/bds-seoul-mariadb)
 > 2. [bds-seoul-hadoop](https://github.com/jathavaan/bds-seoul-hadoop)
 > 3. [bds-seoul-client](https://github.com/jathavaan/bds-seoul-client)
 
