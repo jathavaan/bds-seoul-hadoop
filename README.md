@@ -94,7 +94,7 @@ ssh seoul-3@<ip-address-of-raspberry-pi-3>
 Replace `<ip-address-of-raspberry-pi-3>` with the actual IP-address of the Raspberry Pi, and enter the password
 `seoul-3`.
 
-Then change directory into the `bds-seoul-mariadb` directory:
+Then change directory into the `bds-seoul-hadoop` directory:
 
 ```powershell
 cd bds-seoul-hadoop
@@ -141,7 +141,7 @@ force recreating with the following command:
 > [!NOTE]
 > If you are doing this on a Raspberry Pi, use `sudo docker compose` instead of `docker-compose`.
 
-The next step is to create the containers by running the following command in the root of `bds-seoul-mariadb` directory:
+The next step is to create the containers by running the following command in the root of `bds-seoul-hadoop` directory:
 
 ```powershell
 docker-compose up -d
